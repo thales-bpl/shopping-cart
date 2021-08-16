@@ -16,7 +16,7 @@ function createCustomElement(element, className, innerText) {
 }
 
 function cartItemClickListener(event) {
-  // coloque seu código aqui
+  
 }
 
 function createCartItemElement({ sku, name, salePrice }) {
@@ -46,8 +46,10 @@ function getSkuFromProductItem(item) {
 
 //
 //
-const cartItems1 = document.querySelector('#cart__items');
-const cartItems2 = document.getElementsByClassName('cart__items');
+/* const cartItems2 = document.getElementsByClassName('cart__items');
+console.log(cartItems2); */
+/*   const cartItems1 = document.querySelector('#cart__items'); */
+/*   console.log(cartItems1); */
 
 const addToCart = (productJson) => {
   const productInfo = createCartItemElement({
@@ -55,7 +57,7 @@ const addToCart = (productJson) => {
     name: productJson.title,
     salePrice: productJson.price,
   });
-  const cartItems = document.getElementsByClassName('cart__items');
+  const cartItems = document.getElementsByTagName('ol')[0];
   cartItems.appendChild(productInfo);
 };
 
@@ -67,6 +69,11 @@ const skuCatcher = async (event) => {
   addToCart(data);
 };
 
+/* ERROR: Uncaught (in promise) TypeError:
+    cartItems.appendChild is not a function
+    at addToCart (script.js:59)
+    at HTMLButtonElement.skuCatcher (script.js:67) */
+
 const addMapProduct = (resultSearch) => {
   const productItemElement = createProductItemElement({
     sku: resultSearch.id,
@@ -76,7 +83,6 @@ const addMapProduct = (resultSearch) => {
   const sectionItens = document.querySelector('.items');
   sectionItens.appendChild(productItemElement);
 };
-
 
 const fetchProducts = async (product) => {
   const data = await fetch(`${API_URL}${product}`);
