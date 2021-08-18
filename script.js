@@ -46,10 +46,6 @@ function getSkuFromProductItem(item) {
 
 //
 //
-/* const cartItems2 = document.getElementsByClassName('cart__items');
-console.log(cartItems2); */
-/*   const cartItems1 = document.querySelector('#cart__items'); */
-/*   console.log(cartItems1); */
 
 const addToCart = (productJson) => {
   const productInfo = createCartItemElement({
@@ -59,6 +55,7 @@ const addToCart = (productJson) => {
   });
   const cartItems = document.getElementsByTagName('ol')[0];
   cartItems.appendChild(productInfo);
+  addToLocalStorage(productInfo.innerHTML);
 };
 
 const skuCatcher = async (event) => {
@@ -68,11 +65,6 @@ const skuCatcher = async (event) => {
     .then((api) => api.json());
   addToCart(data);
 };
-
-/* ERROR: Uncaught (in promise) TypeError:
-    cartItems.appendChild is not a function
-    at addToCart (script.js:59)
-    at HTMLButtonElement.skuCatcher (script.js:67) */
 
 const addMapProduct = (resultSearch) => {
   const productItemElement = createProductItemElement({
@@ -90,7 +82,36 @@ const fetchProducts = async (product) => {
   return products;
 };
 
+const addToLocalStorage = (product) => {
+  /* if (localStorage.getItem('products') === null) {
+    localStorage.setItem('products', JSON.stringify([]));
+  } */
+  const oldList = JSON.parse(localStorage.getItem('products'));
+  oldList.push(product);
+  localStorage.setItem('products', JSON.stringify(oldList));
+};
+
+const initialCartRender = () => {
+  if (localStorage.getItem('products') === null) {
+    localStorage.setItem('products', JSON.stringify([]));
+  } else {
+    const productList = JSON.parse(localStorage.getItem('products'));
+    productList.forEach((item) => createCartItemFromStorage(item));
+  }
+};
+
+function createCartItemFromStorage(productSpecs) {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = productSpecs;
+  li.addEventListener('click', cartItemClickListener);
+  const cartItems = document.getElementsByTagName('ol')[0];
+  cartItems.appendChild(li);
+}
+// implementar remoção do carrinho / storage
+
 window.onload = () => {
   fetchProducts('computador')
   .then((products) => products.results.forEach((element) => addMapProduct(element)));
+  initialCartRender();
 };
