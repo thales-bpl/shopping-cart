@@ -27,6 +27,38 @@ function createCartItemElement({ sku, name, salePrice }) {
   return li;
 }
 
+const addToLocalStorage = (product) => {
+  /* if (localStorage.getItem('products') === null) {
+    localStorage.setItem('products', JSON.stringify([]));
+  } */
+  const oldList = JSON.parse(localStorage.getItem('products'));
+  oldList.push(product);
+  localStorage.setItem('products', JSON.stringify(oldList));
+};
+
+const addToCart = (productJson) => {
+  const productInfo = createCartItemElement({
+    sku: productJson.id,
+    name: productJson.title,
+    salePrice: productJson.price,
+  });
+  const cartItems = document.getElementsByTagName('ol')[0];
+  cartItems.appendChild(productInfo);
+  addToLocalStorage(productInfo.innerHTML);
+};
+
+function getSkuFromProductItem(item) {
+  return item.querySelector('span.item__sku').innerText;
+}
+
+const skuCatcher = async (event) => {
+  const parent = event.target.parentElement;
+  const productId = getSkuFromProductItem(parent);
+  const data = await fetch(`https://api.mercadolibre.com/items/${productId}`)
+    .then((api) => api.json());
+  addToCart(data);
+};
+
 function createProductItemElement({ sku, name, image }) {
   const section = document.createElement('section');
   section.className = 'item';
@@ -40,31 +72,8 @@ function createProductItemElement({ sku, name, image }) {
   return section;
 }
 
-function getSkuFromProductItem(item) {
-  return item.querySelector('span.item__sku').innerText;
-}
-
 //
 //
-
-const addToCart = (productJson) => {
-  const productInfo = createCartItemElement({
-    sku: productJson.id,
-    name: productJson.title,
-    salePrice: productJson.price,
-  });
-  const cartItems = document.getElementsByTagName('ol')[0];
-  cartItems.appendChild(productInfo);
-  addToLocalStorage(productInfo.innerHTML);
-};
-
-const skuCatcher = async (event) => {
-  const parent = event.target.parentElement;
-  const productId = getSkuFromProductItem(parent);
-  const data = await fetch(`https://api.mercadolibre.com/items/${productId}`)
-    .then((api) => api.json());
-  addToCart(data);
-};
 
 const addMapProduct = (resultSearch) => {
   const productItemElement = createProductItemElement({
@@ -82,14 +91,14 @@ const fetchProducts = async (product) => {
   return products;
 };
 
-const addToLocalStorage = (product) => {
-  /* if (localStorage.getItem('products') === null) {
-    localStorage.setItem('products', JSON.stringify([]));
-  } */
-  const oldList = JSON.parse(localStorage.getItem('products'));
-  oldList.push(product);
-  localStorage.setItem('products', JSON.stringify(oldList));
-};
+function createCartItemFromStorage(productSpecs) {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = productSpecs;
+  li.addEventListener('click', cartItemClickListener);
+  const cartItems = document.getElementsByTagName('ol')[0];
+  cartItems.appendChild(li);
+}
 
 const initialCartRender = () => {
   if (localStorage.getItem('products') === null) {
@@ -100,14 +109,6 @@ const initialCartRender = () => {
   }
 };
 
-function createCartItemFromStorage(productSpecs) {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = productSpecs;
-  li.addEventListener('click', cartItemClickListener);
-  const cartItems = document.getElementsByTagName('ol')[0];
-  cartItems.appendChild(li);
-}
 // implementar remoção do carrinho / storage
 
 window.onload = () => {
