@@ -1,4 +1,5 @@
 // https://github.com/tryber/sd-014-b-project-shopping-cart
+// https://github.com/tryber/sd-014-b-project-shopping-cart/pull/19
 const API_URL = 'https://api.mercadolibre.com/sites/MLB/search?q=';
 
 function createProductImageElement(imageSource) {
@@ -28,12 +29,26 @@ function createCartItemElement({ sku, name, salePrice }) {
 }
 
 const addToLocalStorage = (product) => {
-  /* if (localStorage.getItem('products') === null) {
-    localStorage.setItem('products', JSON.stringify([]));
-  } */
   const oldList = JSON.parse(localStorage.getItem('products'));
   oldList.push(product);
   localStorage.setItem('products', JSON.stringify(oldList));
+};
+
+// capturando o valor de cada item no storage/cart:
+const sumReducer = (acc, cur) => acc + cur;
+
+const updatePrices = () => {
+  const priceList = JSON.parse(localStorage.getItem('prices'));
+  const totalPrice = priceList.reduce(sumReducer);
+  const totalPriceDiv = document.getElementById('total-cart-price');
+  totalPriceDiv.innerHTML = totalPrice;
+};
+
+const addPriceToStorage = (productPrice) => {
+  const priceList = JSON.parse(localStorage.getItem('prices'));
+  priceList.push(productPrice);
+  localStorage.setItem('prices', JSON.stringify(priceList));
+  updatePrices();
 };
 
 const addToCart = (productJson) => {
@@ -45,6 +60,7 @@ const addToCart = (productJson) => {
   const cartItems = document.getElementsByTagName('ol')[0];
   cartItems.appendChild(productInfo);
   addToLocalStorage(productInfo.innerHTML);
+  addPriceToStorage(productJson.price);
 };
 
 function getSkuFromProductItem(item) {
@@ -109,10 +125,17 @@ const initialCartRender = () => {
   }
 };
 
-// implementar remoção do carrinho / storage
+const renderPrices = () => {
+  if (localStorage.getItem('prices') === null) {
+    localStorage.setItem('prices', JSON.stringify([]));
+  } else {
+    updatePrices();
+  }
+};
 
 window.onload = () => {
   fetchProducts('computador')
   .then((products) => products.results.forEach((element) => addMapProduct(element)));
   initialCartRender();
+  renderPrices();
 };
