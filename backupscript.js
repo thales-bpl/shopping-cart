@@ -1,4 +1,4 @@
-// https://github.com/tryber/sd-014-b-project-shopping-cart
+/* // https://github.com/tryber/sd-014-b-project-shopping-cart
 // https://github.com/tryber/sd-014-b-project-shopping-cart/pull/19
 const API_URL = 'https://api.mercadolibre.com/sites/MLB/search?q=';
 
@@ -48,7 +48,7 @@ function cartItemClickListener(event) { // obrigatória
   itemToBeRemoved.remove();
   const allCartItems = document.querySelector('.cart__items');
   localStorage.setItem('products', allCartItems.innerHTML);
-  /* const itemTextToBeRemoved = itemToBeRemoved.innerText; */
+  // const itemTextToBeRemoved = itemToBeRemoved.innerText;
   const productList = JSON.parse(localStorage.getItem('products'));
   removePriceFromStorageByIndex(productList.indexOf(itemToBeRemoved));
   const newList = productList.filter((item) => item !== itemTextToBeRemoved);
@@ -179,3 +179,5 @@ window.onload = () => {
   cartRender();
   renderPrices();
 };
+
+*/

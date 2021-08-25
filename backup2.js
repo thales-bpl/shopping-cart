@@ -1,4 +1,4 @@
-const BASE_URL = 'https://api.mercadolibre.com/sites/MLB';
+/* const BASE_URL = 'https://api.mercadolibre.com/sites/MLB';
 
 const fetchProducts = async () => {
   const data = await fetch(`${BASE_URL}/search?q=computador`);
@@ -58,4 +58,4 @@ window.onload = () => {
       const resultSearch = dataJson.result;
       resultSearch.forEach((result) => addProductToSection(result));
     });
-};
+}; */
