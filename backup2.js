@@ -20,24 +20,6 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
-const addItemToCart = (productJson) => {
-  const productInfo = createCartItemElement({
-    sku: productJson.id,
-    name: productJson.title,
-    salePrice: productJson.price,
-  });
-  const cartItems = document.querySelector('.cart__items');
-  cartItems.appendChild(productInfo);
-};
-
-async function getSkuFromProductItem(item) {
-  const parent = item.target.parentElement;
-  const productId = parent.querySelector('span.item__sku').innerText;
-  const data = await fetch(`https://api.mercadolibre.com/items/${productId}`)
-    .then((api) => api.json());
-  addItemToCart(data);
-}
-
 function createProductItemElement({ sku, name, image }) {
   const section = document.createElement('section');
   section.className = 'item';
@@ -45,24 +27,21 @@ function createProductItemElement({ sku, name, image }) {
   section.appendChild(createCustomElement('span', 'item__sku', sku));
   section.appendChild(createCustomElement('span', 'item__title', name));
   section.appendChild(createProductImageElement(image));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'))
-    .addEventListener('click', getSkuFromProductItem);
+  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
 
   return section;
 }
 
-const addProductToSection = (resultSearch) => {
-  const productItemElement = createProductItemElement({
-    sku: resultSearch.id,
-    name: resultSearch.title,
-    image: resultSearch.thumbnail,
-  });
-  const cartList = document.querySelector('.items');
-  cartList.appendChild(productItemElement);
+const addProductToSection = () => {
+
 };
 
+function getSkuFromProductItem(item) {
+  return item.querySelector('span.item__sku').innerText;
+}
+
 function cartItemClickListener(event) {
-  event.target.remove();
+  // coloque seu código aqui
 }
 
 function createCartItemElement({ sku, name, salePrice }) {
@@ -76,6 +55,7 @@ function createCartItemElement({ sku, name, salePrice }) {
 window.onload = () => {
   fetchProducts()
     .then((dataJson) => {
-      dataJson.results.forEach((result) => addProductToSection(result));
+      const resultSearch = dataJson.result;
+      resultSearch.forEach((result) => addProductToSection(result));
     });
 };

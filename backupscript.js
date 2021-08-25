@@ -49,10 +49,10 @@ function cartItemClickListener(event) { // obrigatória
   const allCartItems = document.querySelector('.cart__items');
   localStorage.setItem('products', allCartItems.innerHTML);
   /* const itemTextToBeRemoved = itemToBeRemoved.innerText; */
-/*   const productList = JSON.parse(localStorage.getItem('products'));
+  const productList = JSON.parse(localStorage.getItem('products'));
   removePriceFromStorageByIndex(productList.indexOf(itemToBeRemoved));
   const newList = productList.filter((item) => item !== itemTextToBeRemoved);
-  localStorage.setItem('products', JSON.stringify(newList)); */
+  localStorage.setItem('products', JSON.stringify(newList));
 }
 
 function cartItemClickListener2(event) {
