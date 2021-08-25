@@ -20,6 +20,26 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
+const addItemToStorage = (newItem) => {
+  const productList = JSON.parse(localStorage.getItem('products'));
+  productList.push(newItem);
+  localStorage.setItem('products', JSON.stringify(productList));
+};
+
+//
+function cartItemClickListener(event) {
+  event.target.remove();
+  // add update Storage
+}
+
+function createCartItemElement({ sku, name, salePrice }) {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+}
+
 const addItemToCart = (productJson) => {
   const productInfo = createCartItemElement({
     sku: productJson.id,
@@ -28,6 +48,7 @@ const addItemToCart = (productJson) => {
   });
   const cartItems = document.querySelector('.cart__items');
   cartItems.appendChild(productInfo);
+  addItemToStorage(productInfo.innerHTML);
 };
 
 async function getSkuFromProductItem(item) {
@@ -61,21 +82,30 @@ const addProductToSection = (resultSearch) => {
   cartList.appendChild(productItemElement);
 };
 
-function cartItemClickListener(event) {
-  event.target.remove();
-}
+//
 
-function createCartItemElement({ sku, name, salePrice }) {
+const createCartItemFromStorage = (productSpecs) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.innerText = productSpecs;
   li.addEventListener('click', cartItemClickListener);
-  return li;
-}
+  const cartItems = document.querySelector('.cart__items');
+  cartItems.appendChild(li);
+};
+
+const cartRender = () => {
+  if (localStorage.getItem('products') === null) {
+    localStorage.setItem('products', JSON.stringify([]));
+  } else {
+    const productList = JSON.parse(localStorage.getItem('products'));
+    productList.forEach((item) => createCartItemFromStorage(item));
+  }
+};
 
 window.onload = () => {
   fetchProducts()
     .then((dataJson) => {
       dataJson.results.forEach((result) => addProductToSection(result));
     });
+  cartRender();
 };
