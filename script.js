@@ -1,40 +1,18 @@
 const BASE_URL = 'https://api.mercadolibre.com/sites/MLB';
 
-const fetchProducts = async () => {
-  const data = await fetch(`${BASE_URL}/search?q=computador`);
+const fetchProducts = async (product) => {
+  const data = await fetch(`${BASE_URL}/search?q=${product}`);
   const products = await data.json();
   return products;
 };
 
-function createProductImageElement(imageSource) {
-  const img = document.createElement('img');
-  img.className = 'item__image';
-  img.src = imageSource;
-  return img;
-}
-
-function createCustomElement(element, className, innerText) {
-  const e = document.createElement(element);
-  e.className = className;
-  e.innerText = innerText;
-  return e;
-}
-
-const addItemToStorage = (newItem) => {
-  const productList = JSON.parse(localStorage.getItem('products'));
-  productList.push(newItem);
-  localStorage.setItem('products', JSON.stringify(productList));
-};
-
-// prices:
-
 const sumReducer = (acc, cur) => acc + cur;
 
-const updateStoragePrices = () => {
+const updateStoragePrices = () => { // Add sum from storage 'prices' into <span>:
   const priceList = JSON.parse(localStorage.getItem('prices'));
   const totalPrice = priceList.reduce(sumReducer, 0);
-  const totalPriceDiv = document.querySelector('.total-price');
-  totalPriceDiv.innerHTML = totalPrice;
+  const totalPriceSpan = document.querySelector('.total-price');
+  totalPriceSpan.innerHTML = totalPrice;
 };
 
 const addPriceToStorage = (productPrice) => {
@@ -51,20 +29,17 @@ const removePriceFromStorageByIndex = (index) => {
   updateStoragePrices();
 };
 
-//
-
-const updateStorageItems = () => {
+const updateStorageItems = () => { // Import shopcart into storage 'products'
   const allCartItems = document.querySelectorAll('li');
-  const cartLength = allCartItems.length; // podemos eliminar essa linha
-  localStorage.setItem('products', JSON.stringify([]));
+  localStorage.setItem('products', JSON.stringify([])); // reset 'products'
   const productList = [];
-  for (let index = 0; index < cartLength; index += 1) {
+  for (let index = 0; index < allCartItems.length; index += 1) {
     productList.push(allCartItems[index].innerText);
   }
   localStorage.setItem('products', JSON.stringify(productList));
 };
 
-function cartItemClickListener(event) {
+function cartItemClickListener(event) { // listener: removes element from shopcart and its price from storage
   const allCartItems = document.querySelectorAll('li');
   for (let index = 0; index < allCartItems.length; index += 1) {
     if (allCartItems[index] === event.target) {
@@ -74,6 +49,12 @@ function cartItemClickListener(event) {
   event.target.remove();
   updateStorageItems();
 }
+
+const addItemToStorage = (newItem) => { // Add item from shopcart into storage
+  const productList = JSON.parse(localStorage.getItem('products'));
+  productList.push(newItem);
+  localStorage.setItem('products', JSON.stringify(productList));
+};
 
 function createCartItemElement({ sku, name, salePrice }) {
   const li = document.createElement('li');
@@ -109,6 +90,20 @@ async function getSkuFromProductItem(item) {
   addItemToCart(data);
 }
 
+function createCustomElement(element, className, innerText) {
+  const e = document.createElement(element);
+  e.className = className;
+  e.innerText = innerText;
+  return e;
+}
+
+function createProductImageElement(imageSource) {
+  const img = document.createElement('img');
+  img.className = 'item__image';
+  img.src = imageSource;
+  return img;
+}
+
 function createProductItemElement({ sku, name, image }) {
   const section = document.createElement('section');
   section.className = 'item';
@@ -122,7 +117,7 @@ function createProductItemElement({ sku, name, image }) {
   return section;
 }
 
-const addProductToSection = (resultSearch) => {
+const importProductFromApiToSection = (resultSearch) => {
   const productItemElement = createProductItemElement({
     sku: resultSearch.id,
     name: resultSearch.title,
@@ -132,9 +127,7 @@ const addProductToSection = (resultSearch) => {
   cartList.appendChild(productItemElement);
 };
 
-//
-
-const createCartItemFromStorage = (productSpecs) => {
+const createCartItemFromStorage = (productSpecs) => { // Add item from storage into shopcart
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = productSpecs;
@@ -143,7 +136,7 @@ const createCartItemFromStorage = (productSpecs) => {
   cartItems.appendChild(li);
 };
 
-const cartRender = () => {
+const cartRender = () => { // Initial storage rendering
   if (localStorage.getItem('products') === null) {
     localStorage.setItem('products', JSON.stringify([]));
   } else {
@@ -152,7 +145,7 @@ const cartRender = () => {
   }
 };
 
-const renderPrices = () => {
+const renderPrices = () => { // Initial storage rendering
   if (localStorage.getItem('prices') === null) {
     localStorage.setItem('prices', JSON.stringify([]));
   } else {
@@ -160,8 +153,7 @@ const renderPrices = () => {
   }
 };
 
-// botão apagar carrinho:
-const emptyCart = () => {
+const emptyCart = () => { // Empty cart button feature
   const allCartItems = document.querySelector('ol');
   allCartItems.innerHTML = '';
   localStorage.setItem('prices', JSON.stringify([])); 
@@ -173,9 +165,9 @@ const emptyCartButton = document.querySelector('.empty-cart');
 emptyCartButton.addEventListener('click', emptyCart);
 
 window.onload = () => {
-  fetchProducts()
+  fetchProducts('computador')
     .then((dataJson) => {
-      dataJson.results.forEach((result) => addProductToSection(result));
+      dataJson.results.forEach((result) => importProductFromApiToSection(result));
     })
     .then(() => document.querySelector('.loading').remove());
   cartRender();
