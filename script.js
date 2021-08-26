@@ -26,23 +26,52 @@ const addItemToStorage = (newItem) => {
   localStorage.setItem('products', JSON.stringify(productList));
 };
 
+// prices:
+
+const sumReducer = (acc, cur) => acc + cur;
+
+const updateStoragePrices = () => {
+  const priceList = JSON.parse(localStorage.getItem('prices'));
+  const totalPrice = priceList.reduce(sumReducer, 0);
+  const totalPriceDiv = document.querySelector('.total-price');
+  totalPriceDiv.innerHTML = totalPrice;
+};
+
+const addPriceToStorage = (productPrice) => {
+  const priceList = JSON.parse(localStorage.getItem('prices'));
+  priceList.push(productPrice);
+  localStorage.setItem('prices', JSON.stringify(priceList));
+  updateStoragePrices();
+};
+
+const removePriceFromStorageByIndex = (index) => {
+  const priceList = JSON.parse(localStorage.getItem('prices'));
+  priceList.splice(index, 1);
+  localStorage.setItem('prices', JSON.stringify(priceList));
+  updateStoragePrices();
+};
+
 //
 
 const updateStorageItems = () => {
   const allCartItems = document.querySelectorAll('li');
-  const cartLength = allCartItems.length;
+  const cartLength = allCartItems.length; // podemos eliminar essa linha
   localStorage.setItem('products', JSON.stringify([]));
   const productList = [];
   for (let index = 0; index < cartLength; index += 1) {
     productList.push(allCartItems[index].innerText);
-    console.log(productList);
   }
-  localStorage.setItem('products', productList);
+  localStorage.setItem('products', JSON.stringify(productList));
 };
 
 function cartItemClickListener(event) {
+  const allCartItems = document.querySelectorAll('li');
+  for (let index = 0; index < allCartItems.length; index += 1) {
+    if (allCartItems[index] === event.target) {
+      removePriceFromStorageByIndex(index);
+    }
+  }
   event.target.remove();
-  // add update Storage
   updateStorageItems();
 }
 
@@ -63,6 +92,7 @@ const addItemToCart = (productJson) => {
   const cartItems = document.querySelector('.cart__items');
   cartItems.appendChild(productInfo);
   addItemToStorage(productInfo.innerHTML);
+  addPriceToStorage(productJson.price);
 };
 
 async function getSkuFromProductItem(item) {
@@ -116,17 +146,21 @@ const cartRender = () => {
   }
 };
 
-/* const renderPrices = () => {
+const renderPrices = () => {
   if (localStorage.getItem('prices') === null) {
     localStorage.setItem('prices', JSON.stringify([]));
+  } else {
+    updateStoragePrices();
   }
-}; */
+};
 
 // botão apagar carrinho:
 const emptyCart = () => {
   const allCartItems = document.querySelector('ol');
   allCartItems.innerHTML = '';
-  // add update storage
+  localStorage.setItem('prices', JSON.stringify([])); 
+  updateStorageItems();
+  updateStoragePrices();
 };
 
 const emptyCartButton = document.querySelector('.empty-cart');
@@ -139,5 +173,5 @@ window.onload = () => {
     })
     .then(() => document.querySelector('.loading').remove());
   cartRender();
-  /* renderPrices(); */
+  renderPrices();
 };
