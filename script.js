@@ -91,6 +91,12 @@ const addItemToCart = (productJson) => {
   });
   const cartItems = document.querySelector('.cart__items');
   cartItems.appendChild(productInfo);
+  if (localStorage.getItem('products') === null) {
+    localStorage.setItem('products', JSON.stringify([]));
+  }
+  if (localStorage.getItem('prices') === null) {
+    localStorage.setItem('prices', JSON.stringify([]));
+  }
   addItemToStorage(productInfo.innerHTML);
   addPriceToStorage(productJson.price);
 };
